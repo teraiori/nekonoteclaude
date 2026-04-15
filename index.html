@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>認証完了</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 60px auto; padding: 20px; }
+    #code-box { font-family: monospace; padding: 12px; background: #f0f0f0; border-radius: 6px; word-break: break-all; margin: 16px 0; }
+    button { padding: 8px 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h2>✅ Google認証完了</h2>
+  <p>以下のコードをコピーして、Discordで <code>/tasks-code</code> コマンドで送信してください：</p>
+  <div id="code-box"></div>
+  <button onclick="navigator.clipboard.writeText(document.getElementById('code-box').textContent).then(()=>this.textContent='コピーしました！')">コピー</button>
+  <script>
+    const code = new URLSearchParams(window.location.search).get('code');
+    document.getElementById('code-box').textContent = code || '(コードが見つかりません)';
+  </script>
+</body>
+</html>
