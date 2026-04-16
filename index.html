@@ -5,27 +5,33 @@
   <title>認証完了</title>
   <style>
     body { font-family: sans-serif; max-width: 600px; margin: 60px auto; padding: 20px; text-align: center; }
-    #code-box { font-family: monospace; padding: 12px; background: #f0f0f0; border-radius: 6px; word-break: break-all; margin: 16px 0; text-align: left; }
-    .btn { display: inline-block; padding: 12px 28px; border-radius: 8px; font-size: 16px; cursor: pointer; border: none; margin: 8px; background: #5865F2; color: white; }
+    .steps { text-align: left; background: #f8f8f8; border-radius: 8px; padding: 16px 24px; margin: 20px 0; }
+    .steps li { margin: 10px 0; font-size: 15px; }
+    #code-box { font-family: monospace; font-size: 18px; padding: 12px; background: #e8f0fe; border-radius: 6px; margin: 12px 0; letter-spacing: 1px; }
+    .btn { display: inline-block; padding: 12px 28px; border-radius: 8px; font-size: 16px; cursor: pointer; border: none; background: #5865F2; color: white; }
     .btn:hover { background: #4752C4; }
     #status { margin-top: 12px; color: #2d7d46; font-size: 15px; font-weight: bold; }
   </style>
 </head>
 <body>
   <h2>✅ Google認証完了</h2>
-  <p>下のボタンを押してコマンドをコピーし、<br>Discordに貼り付けて送信してください。</p>
+  <ol class="steps">
+    <li>下の「コードをコピー」を押す</li>
+    <li>Discordで <strong>/tasks-code</strong> と入力してコマンドを選択</li>
+    <li>コード欄にコピーしたコードを貼り付けて送信</li>
+  </ol>
   <div id="code-box"></div>
-  <button class="btn" onclick="copyCommand()">コマンドをコピー</button>
+  <button class="btn" onclick="copyCode()">コードをコピー</button>
   <div id="status"></div>
   <script>
     const code = new URLSearchParams(window.location.search).get('code');
-    document.getElementById('code-box').textContent = `/tasks-code ${code}`;
+    document.getElementById('code-box').textContent = code || '(コードが見つかりません)';
 
-    function copyCommand() {
-      navigator.clipboard.writeText(`/tasks-code ${code}`).then(() => {
-        document.getElementById('status').textContent = '✅ コピーしました！Discordに貼り付けて送信してください。';
+    function copyCode() {
+      navigator.clipboard.writeText(code).then(() => {
+        document.getElementById('status').textContent = '✅ コピーしました！Discordで /tasks-code を入力して貼り付けてください。';
       }).catch(() => {
-        document.getElementById('status').textContent = '上のコマンドを手動でコピーしてください。';
+        document.getElementById('status').textContent = '上のコードを手動でコピーしてください。';
       });
     }
   </script>
