@@ -6,30 +6,27 @@
   <style>
     body { font-family: sans-serif; max-width: 600px; margin: 60px auto; padding: 20px; text-align: center; }
     #code-box { font-family: monospace; padding: 12px; background: #f0f0f0; border-radius: 6px; word-break: break-all; margin: 16px 0; text-align: left; }
-    .btn { display: inline-block; padding: 12px 28px; border-radius: 8px; font-size: 16px; cursor: pointer; border: none; margin: 8px; }
-    #main-btn { background: #5865F2; color: white; }
-    #main-btn:hover { background: #4752C4; }
-    #status { margin-top: 12px; color: #555; font-size: 14px; }
+    .btn { display: inline-block; padding: 12px 28px; border-radius: 8px; font-size: 16px; cursor: pointer; border: none; margin: 8px; background: #5865F2; color: white; }
+    .btn:hover { background: #4752C4; }
+    #status { margin-top: 12px; color: #2d7d46; font-size: 15px; font-weight: bold; }
   </style>
 </head>
 <body>
   <h2>✅ Google認証完了</h2>
-  <p>下のボタンを押すと、コマンドがコピーされてDiscordが開きます。<br>Discordで貼り付け（Ctrl+V）して送信してください。</p>
+  <p>下のボタンを押してコマンドをコピーし、<br>Discordに貼り付けて送信してください。</p>
   <div id="code-box"></div>
-  <button class="btn" id="main-btn" onclick="openDiscord()">Discordで完了する</button>
+  <button class="btn" onclick="copyCommand()">コマンドをコピー</button>
   <div id="status"></div>
   <script>
     const code = new URLSearchParams(window.location.search).get('code');
-    const command = `/tasks-code ${code}`;
-    document.getElementById('code-box').textContent = command;
+    document.getElementById('code-box').textContent = `/tasks-code ${code}`;
 
-    function openDiscord() {
-      navigator.clipboard.writeText(command).then(() => {
-        document.getElementById('status').textContent = 'コマンドをコピーしました！Discordに貼り付けて送信してください。';
+    function copyCommand() {
+      navigator.clipboard.writeText(`/tasks-code ${code}`).then(() => {
+        document.getElementById('status').textContent = '✅ コピーしました！Discordに貼り付けて送信してください。';
       }).catch(() => {
         document.getElementById('status').textContent = '上のコマンドを手動でコピーしてください。';
       });
-      setTimeout(() => { window.location = 'discord://'; }, 300);
     }
   </script>
 </body>
