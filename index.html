@@ -2,10 +2,13 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>Google認証</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex">
+  <title>ねこのてClaude - Google Tasks 連携</title>
   <style>
     body { font-family: sans-serif; max-width: 600px; margin: 60px auto; padding: 20px; text-align: center; }
-    .steps { text-align: left; background: #f8f8f8; border-radius: 8px; padding: 16px 24px; margin: 20px 0; }
+    .steps { text-align: left; background: #f8f8f8; border-radius: 8px; padding: 16px 24px 16px 40px; margin: 20px 0; }
     .steps li { margin: 10px 0; font-size: 15px; }
     #code-box { font-family: monospace; font-size: 18px; padding: 12px; background: #e8f0fe; border-radius: 6px; margin: 12px 0; letter-spacing: 1px; word-break: break-all; }
     .btn { display: inline-block; padding: 12px 28px; border-radius: 8px; font-size: 16px; cursor: pointer; border: none; background: #5865F2; color: white; }
@@ -13,52 +16,65 @@
     #status { margin-top: 12px; font-size: 15px; font-weight: bold; }
     .success { color: #2d7d46; }
     .error-box { background: #fde8e8; border-radius: 8px; padding: 16px 24px; margin: 20px 0; color: #b91c1c; }
+    .note { color: #666; font-size: 13px; margin-top: 24px; }
   </style>
 </head>
 <body>
-  <div id="main"></div>
+  <!-- Google 認証後のリダイレクト先。URL の ?code= を表示し、Discord の /tasks-code に貼ってもらう -->
+  <div id="done" hidden>
+    <h2>✅ Google認証完了</h2>
+    <ol class="steps">
+      <li>下の「コードをコピー」を押す</li>
+      <li>Discordに戻り <strong>/tasks-code</strong> と入力してコマンドを選択</li>
+      <li>code 欄にコピーしたコードを貼り付けて送信</li>
+    </ol>
+    <div id="code-box"></div>
+    <button class="btn" id="copy-btn" type="button">コードをコピー</button>
+    <div id="status"></div>
+    <p class="note">コードは数分で失効し、1回しか使えません。失敗したら /connect-tasks からやり直してください。</p>
+  </div>
+
+  <div id="denied" hidden>
+    <h2>❌ 認証がキャンセルされました</h2>
+    <div class="error-box">
+      <p>エラー: <strong id="error-text"></strong></p>
+      <p>Discordに戻り、もう一度 <strong>/connect-tasks</strong> を実行してください。</p>
+    </div>
+  </div>
+
+  <div id="nocode" hidden>
+    <h2>⚠️ コードが見つかりません</h2>
+    <div class="error-box">
+      <p>このページは Google 認証後に自動でリダイレクトされるページです。</p>
+      <p>Discordで <strong>/connect-tasks</strong> から再度お試しください。</p>
+    </div>
+  </div>
+
   <script>
     const params = new URLSearchParams(window.location.search);
     const code  = params.get('code');
     const error = params.get('error');
-    const main  = document.getElementById('main');
 
+    // URL由来の値は textContent でのみ表示する（innerHTML に入れない）
     if (error) {
-      main.innerHTML = `
-        <h2>❌ 認証がキャンセルされました</h2>
-        <div class="error-box">
-          <p>エラー: <strong>${error}</strong></p>
-          <p>Discordに戻り、もう一度 <strong>/connect-tasks</strong> を実行してください。</p>
-        </div>
-      `;
+      document.getElementById('error-text').textContent = error;
+      document.getElementById('denied').hidden = false;
     } else if (!code) {
-      main.innerHTML = `
-        <h2>⚠️ コードが見つかりません</h2>
-        <div class="error-box">
-          <p>このページは Google 認証後に自動でリダイレクトされるページです。</p>
-          <p>Discordで <strong>/connect-tasks</strong> から再度お試しください。</p>
-        </div>
-      `;
+      document.getElementById('nocode').hidden = false;
     } else {
-      main.innerHTML = `
-        <h2>✅ Google認証完了</h2>
-        <ol class="steps">
-          <li>下の「コードをコピー」を押す</li>
-          <li>Discordで <strong>/tasks-code</strong> と入力してコマンドを選択</li>
-          <li>コード欄にコピーしたコードを貼り付けて送信</li>
-        </ol>
-        <div id="code-box">${code}</div>
-        <button class="btn" onclick="copyCode()">コードをコピー</button>
-        <div id="status"></div>
-      `;
+      document.getElementById('code-box').textContent = code;
+      document.getElementById('done').hidden = false;
+      document.getElementById('copy-btn').addEventListener('click', copyCode);
     }
 
     function copyCode() {
+      const status = document.getElementById('status');
       navigator.clipboard.writeText(code).then(() => {
-        document.getElementById('status').className = 'success';
-        document.getElementById('status').textContent = '✅ コピーしました！Discordで /tasks-code を入力して貼り付けてください。';
+        status.className = 'success';
+        status.textContent = '✅ コピーしました！Discordで /tasks-code を入力して貼り付けてください。';
       }).catch(() => {
-        document.getElementById('status').textContent = '上のコードを手動でコピーしてください。';
+        status.className = '';
+        status.textContent = '上のコードを手動で選択してコピーしてください。';
       });
     }
   </script>
